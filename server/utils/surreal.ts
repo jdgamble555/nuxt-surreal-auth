@@ -192,7 +192,7 @@ export function surrealLogout() {
     )
 }
 
-export function getCurrentUserId() {
+export async function getCurrentUserId(refetch = false) {
 
     const event = useRequestEvent()
 
@@ -203,8 +203,57 @@ export function getCurrentUserId() {
     const token = getCookie(event, SURREAL_COOKIE_NAME)
 
     if (!token) {
-        return null
+        return {
+            data: null,
+            error: null
+        }
     }
 
-    return JSON.parse(atob(token.split('.')[1])).ID.split(':')[1] as string
+    if (refetch) {
+
+        const {
+            data: db,
+            error: dbError
+        } = await createSurrealServer()
+
+        if (dbError) {
+            return {
+                data: null,
+                error: dbError
+            }
+        }
+
+        if (!db) {
+            return {
+                data: null,
+                error: new Error("No SurrealDB instance")
+            }
+        }
+
+        try {
+            const userId = (await db.auth())?.id.id.toString()
+
+            if (!userId) {
+                return {
+                    data: null,
+                    error: null
+                }
+            }
+            return userId
+
+        } catch (error) {
+            console.error('Error fetching user ID:', error)
+            return {
+                data: null,
+                error: error as Error
+            }
+        }
+    }
+
+    const userId = JSON.parse(atob(token.split('.')[1])).ID.split(':')[1] as string
+
+    return {
+        data: userId,
+        error: null
+    }
 }
