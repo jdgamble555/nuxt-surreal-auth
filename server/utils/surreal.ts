@@ -239,7 +239,10 @@ export async function getCurrentUserId(refetch = false) {
                     error: null
                 }
             }
-            return userId
+            return {
+                data: userId,
+                error: null
+            }
 
         } catch (error) {
             console.error('Error fetching user ID:', error)
