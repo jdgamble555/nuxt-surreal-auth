@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     const {
         data: db,
         error: loginError
-    } = await surrealLogin(username, password)
+    } = await surrealLogin(event, username, password)
 
     if (loginError) {
         throw createError({
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const user = getCurrentUserId()
+    const { data: user } = await getCurrentUserId(event)
     if (!user) {
         throw createError({
             statusCode: 401,

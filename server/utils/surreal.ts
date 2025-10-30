@@ -1,4 +1,4 @@
-import { useRequestEvent } from "nuxt/app"
+import type { H3Event } from "h3"
 import { Surreal } from "surrealdb"
 
 
@@ -13,14 +13,9 @@ const COOKIE_OPTIONS = {
 } as Parameters<typeof setCookie>[3]
 
 
-export async function createSurrealServer() {
+export async function createSurrealServer(event: H3Event) {
 
     const config = useRuntimeConfig()
-    const event = useRequestEvent()
-
-    if (!event) {
-        throw new Error("Must be called on the server!")
-    }
 
     const db = new Surreal()
 
@@ -52,16 +47,11 @@ export async function createSurrealServer() {
     }
 }
 
-export async function surrealLogin(username: string, password: string) {
+export async function surrealLogin(event: H3Event, username: string, password: string) {
 
     const config = useRuntimeConfig()
-    const event = useRequestEvent()
 
-    if (!event) {
-        throw new Error("Must be called on the server!")
-    }
-
-    const { data: db, error: dbError } = await createSurrealServer()
+    const { data: db, error: dbError } = await createSurrealServer(event)
 
     if (dbError) {
         return {
@@ -104,7 +94,7 @@ export async function surrealLogin(username: string, password: string) {
 
     } catch (signInError) {
 
-        surrealLogout()
+        surrealLogout(event)
 
         console.error('Sign-in error:', signInError)
         return {
@@ -115,16 +105,11 @@ export async function surrealLogin(username: string, password: string) {
 }
 
 
-export async function surrealRegister(username: string, password: string) {
+export async function surrealRegister(event: H3Event, username: string, password: string) {
 
     const config = useRuntimeConfig()
-    const event = useRequestEvent()
 
-    if (!event) {
-        throw new Error("Must be called on the server!")
-    }
-
-    const { data: db, error: dbError } = await createSurrealServer()
+    const { data: db, error: dbError } = await createSurrealServer(event)
 
     if (dbError) {
         return {
@@ -167,7 +152,7 @@ export async function surrealRegister(username: string, password: string) {
 
     } catch (signUpError) {
 
-        surrealLogout()
+        surrealLogout(event)
 
         console.error('Sign-up error:', signUpError)
         return {
@@ -177,13 +162,7 @@ export async function surrealRegister(username: string, password: string) {
     }
 }
 
-export function surrealLogout() {
-
-    const event = useRequestEvent()
-
-    if (!event) {
-        throw new Error("Must be called on the server!")
-    }
+export function surrealLogout(event: H3Event) {
 
     deleteCookie(
         event,
@@ -192,13 +171,7 @@ export function surrealLogout() {
     )
 }
 
-export async function getCurrentUserId(refetch = false) {
-
-    const event = useRequestEvent()
-
-    if (!event) {
-        throw new Error("Must be called on the server!")
-    }
+export async function getCurrentUserId(event: H3Event, refetch = false) {
 
     const token = getCookie(event, SURREAL_COOKIE_NAME)
 
@@ -214,7 +187,7 @@ export async function getCurrentUserId(refetch = false) {
         const {
             data: db,
             error: dbError
-        } = await createSurrealServer()
+        } = await createSurrealServer(event)
 
         if (dbError) {
             return {
