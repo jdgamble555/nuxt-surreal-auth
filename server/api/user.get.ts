@@ -2,5 +2,5 @@ import { getCurrentUserId } from "../utils/surreal"
 
 export default defineEventHandler(async (event) => {
     const { data: userId } = await getCurrentUserId(event)
-    event.context.auth = { userId }
+    return { userId }
 })
