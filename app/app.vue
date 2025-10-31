@@ -1,22 +1,21 @@
 <script setup lang="ts">
-const userId = useFetch<string | null>("/api/user").data;
+const { userId } = useAuth()
 </script>
 
 <template>
   <main class="mt-10 flex flex-col items-center justify-center space-y-6">
     <NuxtLayout>
-        <NuxtPage />
-    </NuxtLayout>  
+      <NuxtPage />
+    </NuxtLayout>
     <nav class="flex space-x-6">
       <NuxtLink to="/">Home</NuxtLink>
       <template v-if="userId">
-        <Logout />
+        <a href="/api/logout"> Logout </a>
       </template>
       <template v-else>
         <NuxtLink to="/login">Login</NuxtLink>
       </template>
-      <NuxtLink to="/pages">Public Data</NuxtLink>
-      <NuxtLink to="/todos">Todos</NuxtLink>
+      <NuxtLink to="/dashboard">Dashboard</NuxtLink>
     </nav>
   </main>
 </template>

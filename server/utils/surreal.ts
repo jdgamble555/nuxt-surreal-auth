@@ -51,6 +51,8 @@ export async function surrealLogin(event: H3Event, username: string, password: s
 
     const config = useRuntimeConfig()
 
+    console.log(config.surrealUrl, config.surrealNamespace, config.surrealDatabase)
+
     const { data: db, error: dbError } = await createSurrealServer(event)
 
     if (dbError) {

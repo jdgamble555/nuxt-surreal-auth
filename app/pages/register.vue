@@ -1,10 +1,10 @@
 <template>
   <section>
-    <h1 class="text-2xl font-bold">Login</h1>
+    <h1 class="text-2xl font-bold">Register</h1>
 
     <form
       class="mt-10 flex flex-col items-center justify-center space-y-6"
-      action="/api/login"
+      action="/api/register"
       method="POST"
     >
       <input
@@ -22,13 +22,13 @@
         autocomplete="off"
       />
       <button class="rounded-lg border bg-blue-500 p-3 text-white">
-        Login
+        Register
       </button>
     </form>
     <hr class="my-5" />
     <p class="text-center text-gray-600">
-      <NuxtLink to="/register" class="text-blue-500 underline">
-        New User?
+      <NuxtLink to="/login" class="text-blue-500 underline">
+        Already registered?
       </NuxtLink>
     </p>
     <hr class="my-5" />
