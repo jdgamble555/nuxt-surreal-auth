@@ -1,6 +1,6 @@
-export function useAuth() {
+export async function useAuth() {
 
-    const { data, error } = useFetch<{ userId: string | null }>("/api/user", {
+    const { data, error } = await useFetch<{ userId: string | null }>("/api/user", {
         server: true,
         default: () => ({ userId: null }),
         lazy: false

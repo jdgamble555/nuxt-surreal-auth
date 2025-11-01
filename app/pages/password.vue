@@ -1,44 +1,37 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: "guest-guard"
+  middleware: "auth-guard",
 })
 </script>
 
 <template>
   <section>
-    <h1 class="text-2xl font-bold">Register</h1>
+    <h1 class="text-2xl font-bold">Change Password</h1>
 
     <form
       class="mt-10 flex flex-col items-center justify-center space-y-6"
-      action="/api/register"
+      action="/api/password"
       method="POST"
     >
       <input
         class="rounded-lg border p-3"
-        placeholder="Username"
-        name="username"
-        type="text"
+        placeholder="Current Password"
+        name="current_password"
+        type="password"
         readonly
         onfocus="this.removeAttribute('readonly')"
       />
       <input
         class="rounded-lg border p-3"
-        placeholder="Password"
-        name="password"
+        placeholder="New Password"
+        name="new_password"
         type="password"
         readonly
         onfocus="this.removeAttribute('readonly')"
       />
       <button class="rounded-lg border bg-blue-500 p-3 text-white">
-        Register
+        Change Password
       </button>
     </form>
-    <hr class="my-5" />
-    <p class="text-center text-gray-600">
-      <NuxtLink to="/login" class="text-blue-500 underline">
-        Already registered?
-      </NuxtLink>
-    </p>
-    <hr class="my-5" />
   </section>
 </template>

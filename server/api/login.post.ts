@@ -1,4 +1,4 @@
-import { getCurrentUserId, surrealLogin } from "../utils/surreal"
+import { parseToken, surrealLogin } from "../utils/surreal"
 
 export default defineEventHandler(async (event) => {
 
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const {
-        data: db,
+        data: token,
         error: loginError
     } = await surrealLogin(event, username, password)
 
@@ -28,20 +28,21 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    if (!db) {
+    if (!token) {
         throw createError({
             statusCode: 401,
             message: 'Invalid credentials'
         })
     }
 
-    const { data: user } = await getCurrentUserId(event)
-    if (!user) {
+    const userId = parseToken(token)
+
+    if (!userId) {
         throw createError({
             statusCode: 401,
             message: 'Unauthorized'
         })
     }
 
-    return { success: true, user }
+    sendRedirect(event, '/')
 })

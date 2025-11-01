@@ -1,5 +1,5 @@
 import type { H3Event } from "h3"
-import { Surreal } from "surrealdb"
+import { RecordId, Surreal } from "surrealdb"
 
 
 const SURREAL_COOKIE_NAME = 'token'
@@ -51,8 +51,6 @@ export async function surrealLogin(event: H3Event, username: string, password: s
 
     const config = useRuntimeConfig()
 
-    console.log(config.surrealUrl, config.surrealNamespace, config.surrealDatabase)
-
     const { data: db, error: dbError } = await createSurrealServer(event)
 
     if (dbError) {
@@ -90,7 +88,7 @@ export async function surrealLogin(event: H3Event, username: string, password: s
         )
 
         return {
-            data: db,
+            data: token,
             error: null
         }
 
@@ -148,7 +146,7 @@ export async function surrealRegister(event: H3Event, username: string, password
         )
 
         return {
-            data: db,
+            data: token,
             error: null
         }
 
@@ -171,6 +169,72 @@ export function surrealLogout(event: H3Event) {
         SURREAL_COOKIE_NAME,
         COOKIE_OPTIONS
     )
+}
+
+export async function surrealChangePassword(
+    event: H3Event,
+    currentPassword: string,
+    newPassword: string
+) {
+
+    const { data: db, error: dbError } = await createSurrealServer(event)
+
+    if (dbError) {
+        return {
+            data: null,
+            error: dbError
+        }
+    }
+
+    if (!db) {
+        return {
+            data: null,
+            error: new Error("No SurrealDB instance")
+        }
+    }
+
+    try {
+
+        const { data: userId } = await getCurrentUserId(event)
+
+        if (!userId) {
+            return {
+                data: null,
+                error: null
+            }
+        }
+
+        const query = `
+            UPDATE $id
+            SET password = crypto::argon2::generate($new)
+            WHERE crypto::argon2::compare(password, $old)
+        `
+
+        const result = await db.query(query, {
+            id: new RecordId('users', userId),
+            old: currentPassword,
+            new: newPassword
+        }).collect<[{ id: string, password: string, username: string }]>()
+
+
+        if (!result?.length) {
+            return {
+                data: null,
+                error: new Error("Password change failed")
+            }
+        }
+        return {
+            data: result[0],
+            error: null
+        }
+    } catch (error) {
+        console.error('Error changing password:', error)
+        return {
+            data: null,
+            error: error as Error
+        }
+    }
+
 }
 
 export async function getCurrentUserId(event: H3Event, refetch = false) {
@@ -228,10 +292,14 @@ export async function getCurrentUserId(event: H3Event, refetch = false) {
         }
     }
 
-    const userId = JSON.parse(atob(token.split('.')[1])).ID.split(':')[1] as string
+    const userId = parseToken(token)
 
     return {
         data: userId,
         error: null
     }
+}
+
+export function parseToken(token: string) {
+    return JSON.parse(atob(token.split('.')[1])).ID.split(':')[1] as string
 }

@@ -1,3 +1,9 @@
+<script setup lang="ts">
+definePageMeta({
+  middleware: "guest-guard"
+})
+</script>
+
 <template>
   <section>
     <h1 class="text-2xl font-bold">Login</h1>
@@ -6,20 +12,23 @@
       class="mt-10 flex flex-col items-center justify-center space-y-6"
       action="/api/login"
       method="POST"
+      autocomplete="off"
     >
       <input
         class="rounded-lg border p-3"
         placeholder="Username"
         name="username"
         type="text"
-        autocomplete="off"
+        readonly
+        onfocus="this.removeAttribute('readonly')"
       />
       <input
         class="rounded-lg border p-3"
         placeholder="Password"
         name="password"
         type="password"
-        autocomplete="off"
+        readonly
+        onfocus="this.removeAttribute('readonly')"
       />
       <button class="rounded-lg border bg-blue-500 p-3 text-white">
         Login

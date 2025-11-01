@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { userId } = useAuth()
+const { userId } = await useAuth()
 </script>
 
 <template>
