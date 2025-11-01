@@ -25,9 +25,15 @@ export async function createSurrealServer(event: H3Event) {
             database: config.surrealDatabase
         })
     } catch (error) {
-        console.error(error)
+        if (error instanceof Error) {
+            console.error(error)
+            return {
+                error,
+                data: null
+            }
+        }
         return {
-            error,
+            error: new Error('Unknown connection error'),
             data: null
         }
     }
@@ -54,9 +60,16 @@ export async function surrealLogin(event: H3Event, username: string, password: s
     const { data: db, error: dbError } = await createSurrealServer(event)
 
     if (dbError) {
+        if (dbError instanceof Error) {
+            console.error(dbError)
+            return {
+                error: dbError,
+                data: null
+            }
+        }
         return {
-            data: null,
-            error: dbError
+            error: new Error('Unknown login error'),
+            data: null
         }
     }
 
@@ -96,10 +109,16 @@ export async function surrealLogin(event: H3Event, username: string, password: s
 
         surrealLogout(event)
 
-        console.error('Sign-in error:', signInError)
+        if (signInError instanceof Error) {
+            console.error(signInError)
+            return {
+                error: signInError,
+                data: null
+            }
+        }
         return {
-            data: null,
-            error: signInError
+            error: new Error('Unknown sign-in error'),
+            data: null
         }
     }
 }
@@ -154,10 +173,16 @@ export async function surrealRegister(event: H3Event, username: string, password
 
         surrealLogout(event)
 
-        console.error('Sign-up error:', signUpError)
+        if (signUpError instanceof Error) {
+            console.error(signUpError)
+            return {
+                error: signUpError,
+                data: null
+            }
+        }
         return {
-            data: null,
-            error: signUpError
+            error: new Error('Unknown sign-up error'),
+            data: null
         }
     }
 }
@@ -210,14 +235,13 @@ export async function surrealChangePassword(
             WHERE crypto::argon2::compare(password, $old)
         `
 
-        const result = await db.query(query, {
+        const [result] = await db.query(query, {
             id: new RecordId('users', userId),
             old: currentPassword,
             new: newPassword
-        }).collect<[{ id: string, password: string, username: string }]>()
+        }).collect<[{ id: string, password: string, username: string }][]>()
 
-
-        if (!result?.length) {
+        if (!result) {
             return {
                 data: null,
                 error: new Error("Password change failed")
@@ -228,10 +252,16 @@ export async function surrealChangePassword(
             error: null
         }
     } catch (error) {
-        console.error('Error changing password:', error)
+        if (error instanceof Error) {
+            console.error(error)
+            return {
+                error,
+                data: null
+            }
+        }
         return {
-            data: null,
-            error: error as Error
+            error: new Error('Unknown query error'),
+            data: null
         }
     }
 
@@ -284,10 +314,16 @@ export async function getCurrentUserId(event: H3Event, refetch = false) {
             }
 
         } catch (error) {
-            console.error('Error fetching user ID:', error)
+            if (error instanceof Error) {
+                console.error(error)
+                return {
+                    error,
+                    data: null
+                }
+            }
             return {
-                data: null,
-                error: error as Error
+                error: new Error('Unknown authentication error'),
+                data: null
             }
         }
     }

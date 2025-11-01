@@ -24,14 +24,16 @@ export default defineEventHandler(async (event) => {
     if (registerError) {
         throw createError({
             statusCode: 500,
-            message: 'Registration failed'
+            message: 'Registration failed',
+            data: registerError.message
         })
     }
 
     if (!token) {
         throw createError({
             statusCode: 401,
-            message: 'Invalid credentials'
+            message: 'Invalid credentials',
+            data: token
         })
     }
 
@@ -40,7 +42,8 @@ export default defineEventHandler(async (event) => {
     if (!userId) {
         throw createError({
             statusCode: 401,
-            message: 'Unauthorized'
+            message: 'Unauthorized',
+            data: userId
         })
     }
 

@@ -28,14 +28,16 @@ export default defineEventHandler(async (event) => {
     if (changePasswordError) {
         throw createError({
             statusCode: 500,
-            message: 'Change password failed'
+            message: 'Change password failed',
+            data: changePasswordError.message
         })
     }
 
-    if (!newRecord) {
+    if (!newRecord?.id) {
         throw createError({
             statusCode: 401,
-            message: 'Invalid credentials'
+            message: 'Invalid credentials',
+            data: newRecord
         })
     }
 

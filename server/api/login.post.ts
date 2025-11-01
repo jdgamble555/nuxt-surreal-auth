@@ -24,14 +24,16 @@ export default defineEventHandler(async (event) => {
     if (loginError) {
         throw createError({
             statusCode: 500,
-            message: 'Login failed'
+            message: 'Login failed',
+            data: loginError.message
         })
     }
 
     if (!token) {
         throw createError({
             statusCode: 401,
-            message: 'Invalid credentials'
+            message: 'Invalid credentials',
+            data: token
         })
     }
 
@@ -40,7 +42,8 @@ export default defineEventHandler(async (event) => {
     if (!userId) {
         throw createError({
             statusCode: 401,
-            message: 'Unauthorized'
+            message: 'Unauthorized',
+            data: userId
         })
     }
 
