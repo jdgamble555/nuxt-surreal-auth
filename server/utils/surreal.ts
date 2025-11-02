@@ -220,7 +220,7 @@ export async function surrealChangePassword(
 
     try {
 
-        const { data: userId } = await getCurrentUserId(event)
+        const { data: userId } = await getCurrentUserId(event, true)
 
         if (!userId) {
             return {
@@ -264,7 +264,6 @@ export async function surrealChangePassword(
             data: null
         }
     }
-
 }
 
 export async function getCurrentUserId(event: H3Event, refetch = false) {
